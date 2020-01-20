@@ -17,8 +17,7 @@ public class Main {
     public static void main(String[] args) {
 
         String input;
-      //  System.out.println("ВВЕДИТЕ ИМЯ ИЛИ НОМЕР ТЕЛЕФОНА");
-        while (true) {
+             while (true) {
             System.out.print("\nВведите имя или номер телефона: ");
             input = (new Scanner(System.in)).nextLine().trim();
 
@@ -28,68 +27,34 @@ public class Main {
                 list();
             } else if (input.matches(COMMAND_EXIT)) {
                 exit();
-                break;
+               break;
 
             } else if (input.matches(NAME)) {
 
-                nameCheck(input);
+                inputCheck(PHONE,input);
 
             } else if (input_.matches(PHONE)) {
-                phoneCheck(input_);
+                inputCheck(NAME,input_);
             } else {
                 System.out.println("Команда не распознана");
             }
         }
 
     }
-    private static void nameCheck (String s)
+    private static void inputCheck (String regex, String s)
     {
-       if (phonebook.containsKey(s))
-            {
-                System.out.println("Запись найдена: " + s + ": +7" + phonebook.get(s));
-            }
-       else
-           {
-               String inputNumber = "";
-                while (!inputNumber.matches(PHONE))
-                    {
-                    System.out.print("Введите номер телефона: ");
-                    inputNumber = cleanPhoneNumber(new Scanner(System.in).nextLine().trim());
-                    }
-                phonebook.put(s,inputNumber);
-               System.out.println("В телефонну книгу добавлен новый контакт: " + s);
-           }
+        if  (phonebook.containsKey(s) | phonebook.containsValue(s))
+
+        {
+            printIfContains(s);
+        }
+        else
+        {
+            addNewRecord(regex,s);
+        }
     }
 
-    private static void phoneCheck (String s) {
-
-
-            if (phonebook.containsValue(s)) {
-                String name = "";
-                for (String key : phonebook.keySet()){
-                     name = phonebook.get(key);
-                    if (s.equals(phonebook.get(key)))
-                    {
-                        System.out.println("Запись найдена: " + key + ": +7" + s);
-                        break;
-                         }
-                }
-
-            }else {
-                String inputName ="";
-                while (!inputName.matches(NAME)){
-                    System.out.print("Введите имя: ");
-                    inputName = new Scanner(System.in).nextLine().trim();
-                }
-                 phonebook.put(inputName,s);
-                System.out.println("В телефонну книгу добавлен новый контакт: " + inputName);
-
-            }
-
-    }
-
-
-    private static String cleanPhoneNumber(String s) {
+    private static String cleanPhoneNumber(String s)   {
         String phoneStr = s.replaceAll("[^0-9]", "");
         if (phoneStr.length() == 11) {
             phoneStr = phoneStr.substring(1);
@@ -112,4 +77,38 @@ public class Main {
         System.out.println("До встречи!");
     }
 
+    private static void printIfContains (String s) {
+        if (s.matches(PHONE))
+        {
+            String name = "";
+            for (String key : phonebook.keySet()){
+                name = phonebook.get(key);
+                if (s.equals(phonebook.get(key)))
+                {
+                    System.out.println("Запись найдена: " + key + ": +7" + s);
+                    break;
+                }
+            }
+
+        } else if (s.matches(NAME)){
+            System.out.println("Запись найдена: " + s + ": +7" + phonebook.get(s));
+        }
+    }
+
+    private static void addNewRecord (String regex, String s) {
+
+        String inputStr = "";
+        while (!inputStr.matches(regex))
+        {
+            System.out.print("Введите " + (regex == PHONE ? "номер телефона: " : "имя: "));
+           inputStr = new Scanner(System.in).nextLine().trim();
+           if (regex == PHONE) {
+               inputStr = cleanPhoneNumber(inputStr);
+               phonebook.put(s,inputStr);
+            } else {
+               phonebook.put(inputStr,s);
+           }
+            System.out.print("В телефонную книгу добавлен новый контакт: " + (regex == PHONE ? s : inputStr));
+        }
+    }
 }
