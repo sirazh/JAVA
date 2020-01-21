@@ -1,9 +1,18 @@
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+//import java.util.regex.Matcher;
+//import java.util.regex.Pattern;
 
 public class Main {
+
+    public static final String COMMAND_ADD = "ADD\\s+.+";
+    public static final String COMMAND_ADD_TO_INDEX = "ADD\\s+\\d+\\s+.+";
+    public static final String COMMAND_EDIT = "EDIT\\s+\\d+\\s+.+";
+    public static final String COMMAND_DELETE = "DELETE\\s+\\d+";
+    public static final String COMMAND_LIST = "LIST";
+    public static final String COMMAND_EXIT = "EXIT";
+
+    public static ArrayList<String> todolist = new ArrayList<>();
 
     /*
 
@@ -21,9 +30,7 @@ public class Main {
      */
 
     public static void main(String[] args) {
-
-        ArrayList<String> todolist = new ArrayList<>();
-        String s;
+        String input;
         System.out.println("Вам необходимо ввести команду с консоли. Примеры команд: \n" +
                 "    LIST\n" +
                 "    ADD Какое-то дело\n" +
@@ -32,57 +39,80 @@ public class Main {
                 "    DELETE 7");
         while (true) {
             System.out.print("ВВЕДИТЕ КОМАНДУ ----> ");
-            s = (new Scanner(System.in)).nextLine().trim();
+            input = (new Scanner(System.in)).nextLine().trim();
 
-            Pattern threepart = Pattern.compile("([A-Z]+)\\s*([0-9]+\\s+)*(.*)");
-
-            Matcher m = threepart.matcher(s);
-            if (m.matches()) {
-                String command = m.group(1);
-                String digitStr = m.group(2);
-                if (digitStr == null) {
-                    digitStr ="";
-                }else {
-                    digitStr = digitStr.trim();
-                }
-
-                String item = m.group(3);
-                if (command.equals("LIST")) {
-                    if (!todolist.isEmpty()) {
-                        System.out.println("Твой список дел: ");
-                        for (int i = 0; i < todolist.size(); i++) {
-                            System.out.println(i + " - " + todolist.get(i));
-                        }
-                    } else {
-                            System.out.println("Список дел пока пуст");
-                    }
-
-                } else if (command.equals("ADD")) {
-                    if (digitStr.equals("")) {
-                        todolist.add(item);
-                    } else if (Integer.parseInt(digitStr) < todolist.size()){
-
-                        todolist.add(Integer.parseInt(digitStr), item);
-                    } else {
-                        todolist.add(item);
-                    }
-
-                } else if (command.equals("EDIT")) {
-                    todolist.remove(Integer.parseInt(digitStr));
-                    todolist.add(Integer.parseInt(digitStr), item);
-                } else if (command.equals("DELETE")) {
-                    todolist.remove(Integer.parseInt(digitStr));
-                } else if (command.equals("EXIT")) {
-                    System.out.println("Введена команда завершения ввода");
-                    break;
-                } else {
-                    System.out.println("Команда не распознана");
-                }
-
-
-            } else System.out.println("Введите корректные данные!");
-
+            if (input.matches(COMMAND_ADD_TO_INDEX)) {
+                addToIndex(input);
+            } else if (input.matches(COMMAND_ADD)) {
+                add(input);
+            } else if (input.matches(COMMAND_LIST)) {
+                list();
+            } else if (input.matches(COMMAND_EDIT)) {
+                edit(input);
+            } else if (input.matches(COMMAND_DELETE)) {
+                delete(input);
+            } else if (input.matches(COMMAND_EXIT)) {
+                exit();
+                break;
+            } else {
+                System.out.println("Команда не распознана");
+            }
         }
-
    }
+
+   public static void add (String s) {
+        String [] addStr = s.split("\\s+",2);
+        todolist.add(addStr[1]);
+   }
+    public static void addToIndex (String s) {
+        String [] addStrIndex = s.split("\\s+",3);
+        int index = Integer.parseInt(addStrIndex[1]);
+        if (checkIndex(index)) {
+            todolist.add(index, addStrIndex[2]);
+        } else {
+            todolist.add(addStrIndex[2]);
+        }
+    }
+    public static void edit (String s) {
+        String [] editStr = s.split("\\s+",3);
+        int index = Integer.parseInt(editStr[1]);
+        if (checkIndex(index)){
+            todolist.remove(index);
+            todolist.add(index, editStr[2]);
+        } else outOfIndex(index);
+
+
+    }
+
+    public static void delete (String s) {
+        String [] delStr = s.split("\\s+",2);
+        int index = Integer.parseInt(delStr[1]);
+        if (checkIndex(index)){
+            todolist.remove(index);
+        } else outOfIndex(index);
+
+    }
+
+    public static void list () {
+        if (!todolist.isEmpty()) {
+            System.out.println("Твой список дел: ");
+            for (int i = 0; i < todolist.size(); i++) {
+                System.out.println(i + " - " + todolist.get(i));
+            }
+        } else {
+            System.out.println("Список дел пока пуст");
+        }
+    }
+    public static void exit () {
+        System.out.println("Введена команда завершения ввода");
+    }
+
+    public static boolean checkIndex (int index){
+        return index < todolist.size();
+    }
+    public static void outOfIndex (int index){
+        System.out.println("Индекс " + index +" превышает допустимое значение! Введите значение от 0 до " + (todolist.size()-1));
+    }
 }
+
+
