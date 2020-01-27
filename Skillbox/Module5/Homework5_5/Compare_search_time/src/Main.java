@@ -19,36 +19,47 @@ public class Main {
           }
           String goldNumber = s + i + i + i + s + s + region;
           list.add(goldNumber);
-          System.out.println(goldNumber);
         }
       }
     }
     HashSet<String> hashSet = new HashSet<>(list);
     TreeSet<String> treeSet = new TreeSet<>(list);
-
-    while (true) {
+    String s = "";
+    while (!s.equals("EXIT")) {
       System.out.print("Ведите желаемый номер ----> ");
-      String s = (new Scanner(System.in)).nextLine();
+      s = (new Scanner(System.in)).nextLine();
 
-      long start1 = System.currentTimeMillis();
-      list.contains(s);
-      long duration1 = System.currentTimeMillis() - start1;
-      System.out.println("Прямой переобор: " + duration1);
-
-      long start2 = System.currentTimeMillis();
-      Collections.binarySearch(list, s);
-      long duration2 = System.currentTimeMillis() - start2;
-      System.out.println("Бинарным поиском: " + duration2);
-
-      long start3 = System.currentTimeMillis();
-      treeSet.contains(s);
-      long duration3 = System.currentTimeMillis() - start3;
-      System.out.println("TreeSet: " + duration3);
-
-      long start4 = System.currentTimeMillis();
-      hashSet.contains(s);
-      long duration4 = System.currentTimeMillis() - start4;
-      System.out.println("HashSet: " + duration4);
+      System.out.println(
+          "Поиск перебором: " + isFound(list, s) + ", поиск занял " + durationTime(list, s)
+              + " нс");
+      System.out.println(
+          "Бинарный поиск: " + isFound(list, s) + ", поиск занял " + durationTime(list, 2, s)
+              + " нс");
+      System.out.println(
+          "Поиск в TreeSet: " + isFound(treeSet, s) + ", поиск занял " + durationTime(treeSet, s)
+              + " нс");
+      System.out.println(
+          "Поиск в HashSet: " + isFound(hashSet, s) + ", поиск занял " + durationTime(hashSet, s)
+              + " нс");
     }
+  }
+
+  public static long durationTime(Collection obj, String searchStr) {
+    long start = System.nanoTime();
+    obj.contains(searchStr);
+    return System.nanoTime() - start;
+  }
+
+  public static long durationTime(Collection obj, int i, String searchStr) {
+    long start = System.nanoTime();
+    if (i == 2) {
+      List binar = (List) obj;
+      Collections.binarySearch(binar, searchStr);
+    }
+    return System.nanoTime() - start;
+  }
+
+  public static String isFound(Collection obj, String str) {
+    return obj.contains(str) ? "номер найден" : "номер не найден";
   }
 }
